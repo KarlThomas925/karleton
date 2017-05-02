@@ -4,7 +4,7 @@ sinatra skeleton with a few custom presets
 # merge with existing repo
 in the working directory
 ```
-it's on your phone dummy
+looking for the file with the commands that should be here
 ```
 
 
