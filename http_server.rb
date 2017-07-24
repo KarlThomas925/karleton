@@ -2,6 +2,12 @@ require 'socket'
 require 'pry'
 
 class HTTPserver < TCPServer
+  attr_accessor :server_response
+
+  def initialize 
+    @server_response = []
+  end
+
   def run
     client = self.accept    # Wait for a client to connect
     client
@@ -10,12 +16,39 @@ class HTTPserver < TCPServer
     client.close
   end
 
-  def send_200_resource(resource_name)
-  #   response = ["HTTP/1.1 200 OK\r\n"]
-  #   response << "Server: Apache\r\n"
-  #   response << "Content-type : text/html\r\n"
-  #   response << "Content-length: #{IO.binread('testfile.txt').length}\r\n"
-  #   response << "Connection: close\r\n"
-  #   response << IO.binread('testfile.txt').length
+  def send_resource(status, resource_name)
+    determine_status(status)
+    set_resource(resource_name)
+    set_headers
+    add_resource
+    self.server_response.join
+  end
+
+  def determine_status(status)
+    case status
+    when 200
+      self.server_response << "HTTP/1.1 200 OK\r\n"
+    end
+  end
+
+  def set_resource(resource_name)
+    @resource ||= IO.binread('#{resource_name}.txt')
+  end
+
+  def set_headers
+    add_header("Server" => "Darwin")
+    add_header("Content-type" => "text/html"))
+    add_header("Content-length" => @resource.length)
+    add_header("Connection" => "close")
+  end
+
+  def add_header(arg = {})
+    header = arg.keys[0]
+    value = arg[header]
+    self.server_response << header + ": " + value + "\r\n"
+  end
+
+  def add_resource
+    self.response << @resource
   end
 end
