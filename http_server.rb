@@ -1,18 +1,23 @@
 require 'socket'
 require 'pry'
 
-class HTTPserver < TCPServer
-  attr_accessor :server_response, :status
+class HTTPServer
+  attr_accessor :server_response, :status, :server, :client_uri, :resource
 
-  def initialize 
+  def initialize(host, port)
+    @server = TCPServer.new(host, port)
     @status = "200 OK"
     @server_response = []
+    @resource = IO.binread('welcome.txt')
+    @client_uri = nil
   end
 
   def run
     loop do
-      client = self.accept    # Wait for a client to connect
-      client.each_line { |m| puts m}
+      client = self.server.accept    # Wait for a client to connect
+      client.puts client.methods.sort
+      client.puts "###****** _|____|_  ``(._.``)   ******####"
+      client.puts parse_uri(client)
       client.close
     end
   end
@@ -27,8 +32,11 @@ class HTTPserver < TCPServer
 
   def find_resource(resource_name)
     read_file = IO.binread('#{resource_name}.txt')
-    if read_file
-      @resource ||= IO.binread('#{resource_name}.txt')
+    
+    if resource_name == "/"
+      @resource 
+    elsif read_file 
+      @resource = IO.binread('#{resource_name}.txt')
     else
       self.status = "404 Not Found"
     end
@@ -40,7 +48,7 @@ class HTTPserver < TCPServer
 
   def set_headers
     add_header("Server" => "Darwin")
-    add_header("Content-type" => "text/html"))
+    add_header("Content-type" => "text/html")
     add_header("Content-length" => @resource.length)
     add_header("Connection" => "close")
   end
@@ -52,6 +60,12 @@ class HTTPserver < TCPServer
   end
 
   def add_resource
+    self.response << "\r\n"
     self.response << @resource
   end
+
+  def parse_uri(client_request)
+    @client_uri = client_request.first.split[1]
+  end 
+
 end
