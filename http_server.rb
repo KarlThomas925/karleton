@@ -2,37 +2,40 @@ require 'socket'
 require 'pry'
 
 class HTTPserver < TCPServer
-  attr_accessor :server_response
+  attr_accessor :server_response, :status
 
   def initialize 
+    @status = "200 OK"
     @server_response = []
   end
 
   def run
-    client = self.accept    # Wait for a client to connect
-    client
-    client.each_line { |m| puts m}
-  
-    client.close
+    loop do
+      client = self.accept    # Wait for a client to connect
+      client.each_line { |m| puts m}
+      client.close
+    end
   end
 
-  def send_resource(status, resource_name)
-    determine_status(status)
-    set_resource(resource_name)
+  def send_resource_for(requested_resource)
+    find_resource(requested_resource)
+    set_status_line
     set_headers
     add_resource
     self.server_response.join
   end
 
-  def determine_status(status)
-    case status
-    when 200
-      self.server_response << "HTTP/1.1 200 OK\r\n"
+  def find_resource(resource_name)
+    read_file = IO.binread('#{resource_name}.txt')
+    if read_file
+      @resource ||= IO.binread('#{resource_name}.txt')
+    else
+      self.status = "404 Not Found"
     end
   end
 
-  def set_resource(resource_name)
-    @resource ||= IO.binread('#{resource_name}.txt')
+  def set_status_line
+    self.server_response << "HTTP/1.1 #{self.status}\r\n"
   end
 
   def set_headers

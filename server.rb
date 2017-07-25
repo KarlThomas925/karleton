@@ -1,14 +1,7 @@
-require 'socket'
-server = TCPServer.new("127.0.0.1", 2000) # Server bind to port 2000
+require http_server.rb
+server = HTTPServer.new("127.0.0.1", 2000) # Server bind to port 2000
 
-loop do
-  client = server.accept    # Wait for a client to connect
-  puts client
-  client.each_line { |m| puts m}
-  
-  client.close
-end
-
+server.run 
 
 #   response = ["HTTP/1.1 200 OK\r\n"]
 #   response << "Server: Apache\r\n"
