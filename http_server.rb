@@ -17,13 +17,15 @@ class HTTPServer
       client = self.server.accept    # Wait for a client to connect
       client.puts client.methods.sort
       client.puts "###****** _|____|_  ``(._.``)   ******####"
-      client.puts parse_uri(client)
+      resource_request = parse_uri(client)
+      client.puts resource_request
+      client.puts send_resource_for(resource_request)
       client.close
     end
   end
 
-  def send_resource_for(requested_resource)
-    find_resource(requested_resource)
+  def send_resource_for(resource_request)
+    find_resource(resource_request)
     set_status_line
     set_headers
     add_resource
@@ -31,12 +33,10 @@ class HTTPServer
   end
 
   def find_resource(resource_name)
-    read_file = IO.binread('#{resource_name}.txt')
+    return @resource if resource_name == ""
     
-    if resource_name == "/"
-      @resource 
-    elsif read_file 
-      @resource = IO.binread('#{resource_name}.txt')
+    if read_file = IO.binread("#{resource_name}.txt")
+      @resource = read_file
     else
       self.status = "404 Not Found"
     end
@@ -56,16 +56,18 @@ class HTTPServer
   def add_header(arg = {})
     header = arg.keys[0]
     value = arg[header]
-    self.server_response << header + ": " + value + "\r\n"
+    self.server_response << "#{header}: #{value} \r\n"
   end
 
   def add_resource
-    self.response << "\r\n"
-    self.response << @resource
+    self.server_response << "\r\n"
+    self.server_response << @resource
   end
 
   def parse_uri(client_request)
-    @client_uri = client_request.first.split[1]
+    uri = client_request.first.split[1]
+    uri[0] = ""
+    self.client_uri = uri
   end 
 
 end
