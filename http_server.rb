@@ -26,7 +26,7 @@ class HTTPServer
   end
 
   def send_response_for(resource_request)
-    resource = find_resource(resource_request)
+    resource = add_resource(resource_request)
     status_line = set_status_line
     response_headers = format_headers
 
@@ -48,11 +48,14 @@ class HTTPServer
     end
   end
 
+  def add_resource(resource_request)
+    ["\r\n", find_resource(resource_request)]
+  end
+
   def construct_response(status_line, headers, resource)
     response = []
     response << status_line
     response << headers 
-    response << "\r\n"
     response << resource
     response.join
   end
