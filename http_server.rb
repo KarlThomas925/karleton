@@ -2,27 +2,30 @@ require 'socket'
 require 'pry'
 
 class HTTPServer
-  attr_accessor :server_response, :status, :server, :client_uri, :resource
+  attr_accessor :server_response, :status, :server, :client_uri, :resource, :headers_hash
 
   def initialize(host, port)
     @server = TCPServer.new(host, port)
     @status = "200 OK"
     @resource = IO.binread('welcome.erb')
     @client_uri = nil
-    # todo - when i dont have this, it breaks. 
-    @icon = "<link rel='icon' type='image/png' href='bear-face-icon.png' />"  
+    # todo - when i dont have this, it breaks. l8r this will be somewhere else. 
+    @icon = "<link rel='icon' type='image/png' href='bear-face-icon.png' />"
+    @headers_hash = { "Server" => "Darwin", 
+                      "Content-type" => "text/html"
+                      "Connection" => "close"}
 end
 
   def run
     loop do
       client = self.server.accept    # Wait for a client to connect
-      resource_request = parse_uri(client)
-      client.puts send_resource_for(resource_request)
+      request = parse_uri(client)
+      client.puts send_response_for(request)
       client.close
     end
   end
 
-  def send_resource_for(resource_request)
+  def send_response_for(resource_request)
     resource = find_resource(resource_request)
     status_line = set_status_line
 
@@ -34,7 +37,7 @@ end
     return @icon if resource_name == "favicon.ico"
 
     if read_file = IO.binread("#{resource_name}.erb")
-      @resource = read_file
+      self.resource = read_file
     else
       self.status = "404 Not Found"
       false
@@ -53,15 +56,15 @@ end
     "HTTP/1.1 #{self.status}\r\n"
   end
 
-  def response_headers(resource)
-    headers = [ header("Server" => "Darwin"),
-                header("Content-type" => "text/html"),
-                header("Content-length" => resource.length),
-                header("Connection" => "close") ]
+  def format_headers
+    self.headers_hash.map { |header,value| header_to_s(header => value)} 
   end
 
+  def update_headers(header, value)
+    self.headers_hash[header] = value
+  end
 
-  def header(arg = {})
+  def header_to_s(arg = {})
     header = arg.keys[0]
     value = arg[header]
     "#{header}: #{value} \r\n"
