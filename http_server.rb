@@ -7,8 +7,9 @@ class HTTPServer
   def initialize(host, port)
     @server = TCPServer.new(host, port)
     @status = "200 OK"
-    @resource = IO.binread('welcome.txt')
+    @resource = IO.binread('welcome.erb')
     @client_uri = nil
+    # todo - when i dont have this, it breaks. 
     @icon = "<link rel='icon' type='image/png' href='bear-face-icon.png' />"  
 end
 
@@ -32,10 +33,11 @@ end
     return @resource if resource_name == ""
     return @icon if resource_name == "favicon.ico"
 
-    if read_file = IO.binread("#{resource_name}.txt")
+    if read_file = IO.binread("#{resource_name}.erb")
       @resource = read_file
     else
       self.status = "404 Not Found"
+      false
     end
   end
 
@@ -72,8 +74,22 @@ end
   def parse_uri(client_request)
     uri = client_request.first.split[1]
     uri[0] = ""
-
-    self.client_uri = uri
+    uri
   end 
 
+  def path_name(uri)
+    if uri.include?("?")
+      uri.partition("?")[0]
+    else
+      uri
+    end
+  end
+
+  def query_string(uri)
+    uri.partition("?")[2]
+  end
+
+  def create_query_params(query_string)
+    CGI::parse(query_string)
+  end
 end
