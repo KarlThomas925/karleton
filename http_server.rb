@@ -12,9 +12,9 @@ class HTTPServer
     # todo - when i dont have this, it breaks. l8r this will be somewhere else. 
     @icon = "<link rel='icon' type='image/png' href='bear-face-icon.png' />"
     @headers_hash = { "Server" => "Darwin", 
-                      "Content-type" => "text/html"
-                      "Connection" => "close"}
-end
+                      "Content-type" => "text/html",
+                      "Connection" => "close" }
+  end
 
   def run
     loop do
@@ -28,8 +28,9 @@ end
   def send_response_for(resource_request)
     resource = find_resource(resource_request)
     status_line = set_status_line
+    response_headers = format_headers
 
-    construct_response(status_line, response_headers(resource), resource)
+    construct_response(status_line, response_headers, resource)
   end
 
   def find_resource(resource_name)
@@ -37,6 +38,9 @@ end
     return @icon if resource_name == "favicon.ico"
 
     if read_file = IO.binread("#{resource_name}.erb")
+
+      # the plus one is for the added linebrake of the response. 
+      update_headers("Content-Length", read_file.length+1)
       self.resource = read_file
     else
       self.status = "404 Not Found"
@@ -48,6 +52,7 @@ end
     response = []
     response << status_line
     response << headers 
+    response << "\r\n"
     response << resource
     response.join
   end
@@ -68,10 +73,6 @@ end
     header = arg.keys[0]
     value = arg[header]
     "#{header}: #{value} \r\n"
-  end
-
-  def add_resource
-    "\r\n" + @resource
   end
 
   def parse_uri(client_request)
