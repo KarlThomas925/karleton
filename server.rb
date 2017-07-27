@@ -1,4 +1,7 @@
 require_relative 'http_server'
+
+$get_path_hash = {}
+
 server = HTTPServer.new("127.0.0.1", 2000) # Server bind to port 2000
 
 server.run
@@ -9,13 +12,13 @@ server.run
 #   erb :template
 # end
 
-# {"get /thing http 1.1" => yield}
+# {"get /thing http 1.1" => block}
 
 
 
 # def get(path_string, &block)
 
-#   global_ish_hash[path_string] = &block;
+#   global_ish_hash[path_string] = block;
 # end
 
 

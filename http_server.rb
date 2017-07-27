@@ -25,6 +25,21 @@ class HTTPServer
     end
   end
 
+
+  def get(path_name, &block)
+    request = "GET #{path_name} HTTP/1.1"
+    $get_path_hash[request] = block
+  end
+
+  # example get request in sinatra 
+  # get "/welcome" do 
+  #   @first = params[:first]
+  #   @last =  params[:last]
+  #   find_resource :welcome
+  # end
+
+
+
   def send_response_for(resource_request)
     resource = add_resource(resource_request)
     status_line = set_status_line
@@ -98,5 +113,9 @@ class HTTPServer
 
   def create_query_params(query_string)
     CGI::parse(query_string)
+  end
+  
+  def format_request_line(path_name)
+    "GET #{path_name} HTTP/1.1"
   end
 end
