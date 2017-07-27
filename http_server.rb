@@ -38,7 +38,10 @@ class HTTPServer
   #   find_resource :welcome
   # end
 
-
+  def handle_get_request(client_request)
+    parse_uri(client_request)
+    path_name(uri)
+  end
 
   def send_response_for(resource_request)
     resource = add_resource(resource_request)
