@@ -45,7 +45,7 @@ class HTTPResponse
 
 
   def add_resource(resource_request)
-    ["\r\n", er(resource_request)]
+    ["\r\n", erb(resource_request)]
   end
 
 
