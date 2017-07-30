@@ -1,16 +1,13 @@
 require_relative "../http_server"
 require_relative "../http_response"
+require 'httparty'
 
 describe HTTPServer do
   let(:host) { "127.0.0.1" }
   let(:port) { 2000 }
-  let(:example_client_request) {<<~HEREDOC
-                                    GET /profile HTTP/1.1
-                                    Host: 127.0.0.1:2000
-                                    User-Agent: curl/7.49.1
-                                    Accept: */*
-                                HEREDOC
-                                }
+  let(:example_client_request) {[ "GET /profile HTTP/1.1",
+                                  "Host: 127.0.0.1:2000"]}
+
   around(:each) do |example|
     @server = HTTPServer.new(host, port) 
     example.run
@@ -35,17 +32,22 @@ describe HTTPServer do
     end
   end 
 
-  describe "header_to_s" do
+  describe "#header_to_s" do
     it "formats a key value pair in HTTP response header format" do
       correctly_formated_header = "Header: value \r\n"
       expect(@server.header_to_s(Header: "value")).to eq correctly_formated_header
     end
   end
 
-  describe "parse_uri" do
-    it "only keeps the uri from the client request" do
-      expect(@server.parse_uri(example_client_request)).to not_include "HTTP/1.1"
-      puts example_client_request.methods.sort
+  xdescribe "#accept_client" do 
+    it "has the server wait for a client and then intercepts their request" do
+      expect(@server.accept_client).to be_an_instance_of TCPSocket
+    end
+  end
+
+  describe "#parse_uri" do
+    it "only keeps the uri from the first line of a client request" do
+      expect(@server.parse_uri(example_client_request)).to_not include "HTTP/1.1"
     end
   end
 
