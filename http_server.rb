@@ -12,13 +12,19 @@ class HTTPServer
 
   def run
     loop do
-      client = self.tcp_server.accept    # Wait for a client to connect
+      client = self.accept_client    # Wait for a client to connect
+      puts client 
+      puts client.class
+      puts client.methods.sort
       request = parse_uri(client)
       client.puts self.server_response.sendy(request)
       client.close
     end
   end
 
+  def accept_client
+    self.tcp_server.accept
+  end
 
   def get(path_name, &block)
     request = "GET #{path_name} HTTP/1.1"
