@@ -1,5 +1,6 @@
 require 'socket'
 require 'pry'
+require 'cgi'
 require_relative 'http_response'
 
 class HTTPServer

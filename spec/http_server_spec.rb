@@ -82,13 +82,10 @@ describe HTTPServer do
   describe "#create_query_params" do
     context "when query strings are present" do
       it "turns the query strings into a hash" do
-        expect(@server.create_query_params(example_uri)).to eq
+        data = @server.query_string(example_uri)
+        expect(@server.create_query_params(data)).to eq({ "oh" => [ "hey" ] })
       end
     end
-
   end
-
-
-
 end
 
