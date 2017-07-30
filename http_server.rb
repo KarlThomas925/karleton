@@ -3,19 +3,23 @@ require 'pry'
 require_relative 'http_response'
 
 class HTTPServer
-  attr_reader :server_response, :tcp_server
+  attr_reader :server_response, :tcp_server, :port, :host
 
   def initialize(host, port)
+    @port = port
+    @host = host
     @tcp_server = TCPServer.new(host, port)
     @server_response = HTTPResponse.new
   end
 
   def run
-    client = self.accept_client # Wait for a client to connect
-    # binding.pry    
-    request = parse_uri(client)
-    client.puts self.server_response.sendy(request)
-    client.close
+    loop do
+      client = self.accept_client # Wait for a client to connect
+      # binding.pry    
+      request = parse_uri(client)
+      client.puts self.server_response.sendy(request)
+      client.close
+    end
   end
 
   def accept_client

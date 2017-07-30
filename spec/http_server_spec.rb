@@ -41,20 +41,10 @@ describe HTTPServer do
     end
   end
 
-  xdescribe "#accept_client" do 
+  describe "#accept_client" do 
     it "has the server wait for a client and then intercepts their request" do
-      client = nil
-      Parallel.each([0, 1]) do |i|
-        if i == 0
-          p "running client"
-         client = @server.accept_client
-        else
-          p "running request"
-          HTTParty.get("http://127.0.0.1:2000/profile")
-        end
-      end
-      client.puts "why"
-
+      TCPSocket.new(@server.host, @server.port)
+      client = @server.accept_client
       expect(client).to be_an_instance_of TCPSocket
     end
   end
@@ -89,7 +79,12 @@ describe HTTPServer do
     end
   end
 
-  xdescribe "#create_query_params" do
+  describe "#create_query_params" do
+    context "when query strings are present" do
+      it "turns the query strings into a hash" do
+        expect(@server.create_query_params(example_uri)).to eq
+      end
+    end
 
   end
 
