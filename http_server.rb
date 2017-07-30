@@ -11,17 +11,15 @@ class HTTPServer
   end
 
   def run
-    loop do
-      client = self.accept_client # Wait for a client to connect
-      binding.pry    
-      request = parse_uri(client)
-      client.puts self.server_response.sendy(request)
-      client.close
-    end
+    client = self.accept_client # Wait for a client to connect
+    # binding.pry    
+    request = parse_uri(client)
+    client.puts self.server_response.sendy(request)
+    client.close
   end
 
   def accept_client
-    @client = self.tcp_server.accept
+    self.tcp_server.accept
   end
 
   def get(path_name, &block)
