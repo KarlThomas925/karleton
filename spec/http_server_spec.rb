@@ -46,10 +46,27 @@ describe HTTPServer do
   end
 
   describe "#parse_uri" do
+    it "only keeps the first line of a client request" do
+      expect(@server.parse_uri(example_client_request)).to_not include "Host:"
+    end
     it "only keeps the uri from the first line of a client request" do
       expect(@server.parse_uri(example_client_request)).to_not include "HTTP/1.1"
     end
   end
+
+  describe "#query_string" do
+
+  end
+
+  describe "#path_name" do
+
+  end
+
+  describe "#create_query_params" do
+
+  end
+
+  
 
 end
 
