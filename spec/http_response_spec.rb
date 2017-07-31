@@ -32,13 +32,6 @@ describe "HTTPResponse" do
       expect(response.resource).to eq resource_2
     end
 
-    it "has an icon instance variable" do
-      expect(response.instance_variable_get(:@icon)).to eq icon_link
-    end
-
-    xit "has a writable" do
-      
-    end
 
     it "has a readable hash of headers" do
       expect(response.headers_hash).to eq starting_headers
@@ -49,6 +42,9 @@ describe "HTTPResponse" do
       expect(response.headers_hash).to eq why_only_a_server
     end
 
+    it "has an icon instance variable" do
+      expect(response.instance_variable_get(:@icon)).to eq icon_link
+    end
 
   end
 
