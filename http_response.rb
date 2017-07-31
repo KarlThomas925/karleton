@@ -2,14 +2,14 @@ class HTTPResponse
   attr_accessor :server_response, :status, :resource, :headers_hash
   def initialize
     @status = "200 OK"
-    @root_resource = IO.binread('welcome.erb')
+    @resource = IO.binread('welcome.erb')
     #   todo - when i dont have this, it breaks. l8r this will be somewhere else. 
     @icon = "<link rel='icon' type='image/png' href='bear-face-icon.png' />"
     @headers_hash = { "Server" => "Darwin", 
                       "Content-type" => "text/html",
                       "Connection" => "close" }
   end
-
+  
 
   def sendy(resource_request)
     resource = add_resource(resource_request)
